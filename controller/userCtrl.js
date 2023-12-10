@@ -11,7 +11,9 @@ const validateMongoDbId = require("../utils/validateMongodbId");
 const { generateRefreshToken } = require("../config/refreshtoken");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const sendEmail = require("./emailCtrl");
+ const sendEmail = require("./emailCtrl");
+const {LocalStorage} = require('node-localstorage') 
+const localStorage = new LocalStorage('./scratch')
 
 // Create a User ----------------------------------------------
 
@@ -63,6 +65,8 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
       lastname: findUser?.lastname,
       email: findUser?.email,
       mobile: findUser?.mobile,
+      address:findUser?.address,
+      image:findUser?.image,
       token: generateToken(findUser?._id),
     });
   } else {
@@ -71,7 +75,6 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
 });
 
 // admin login
-
 const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // check if user exists or not
@@ -90,13 +93,21 @@ const loginAdmin = asyncHandler(async (req, res) => {
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000,
     });
+ 
+    const token = generateToken(findAdmin?._id);
+    if(localStorage.getItem("token")){
+      localStorage.removeItem("token")
+    }
+    await localStorage.setItem("token",JSON.stringify(token))
     res.json({
       _id: findAdmin?._id,
       firstname: findAdmin?.firstname,
       lastname: findAdmin?.lastname,
       email: findAdmin?.email,
       mobile: findAdmin?.mobile,
-      token: generateToken(findAdmin?._id),
+      address:findAdmin?.address,
+      image:findAdmin?.image,
+      token: JSON.parse(localStorage.getItem("token")).toString(),
     });
   } else {
     throw new Error("Invalid Credentials");
@@ -116,7 +127,7 @@ const handleRefreshToken = asyncHandler(async (req, res) => {
       throw new Error("There is something wrong with refresh token");
     }
     const accessToken = generateToken(user?._id);
-    res.json({ accessToken });
+    res.json({ accessToken,user });
   });
 });
 
@@ -134,7 +145,7 @@ const logout = asyncHandler(async (req, res) => {
     });
     return res.sendStatus(204); // forbidden
   }
-  await User.findOneAndUpdate(refreshToken, {
+  await User.findOneAndUpdate({refreshToken}, {
     refreshToken: "",
   });
   res.clearCookie("refreshToken", {
@@ -158,13 +169,27 @@ const updatedUser = asyncHandler(async (req, res) => {
         lastname: req?.body?.lastname,
         email: req?.body?.email,
         mobile: req?.body?.mobile,
+        address:req?.body?.address
       },
       {
         new: true,
       }
     );
-    res.json(updatedUser);
+    const findAdmin = await User.findById(_id);
+    const token=generateToken(_id);
+    
+    res.json({
+      _id: updatedUser._id,
+      firstname: updatedUser.firstname,
+      lastname: updatedUser.lastname,
+      email: updatedUser.email,
+      mobile: updatedUser.mobile,
+      address:updatedUser.address,
+      image:updatedUser.image,
+      token: JSON.parse(localStorage.getItem("token")).toString(),
+    });
   } catch (error) {
+    console.log(error);
     throw new Error(error);
   }
 });
@@ -202,6 +227,7 @@ const getallUser = asyncHandler(async (req, res) => {
   }
 });
 
+
 // Get a single user
 
 const getaUser = asyncHandler(async (req, res) => {
@@ -218,7 +244,8 @@ const getaUser = asyncHandler(async (req, res) => {
   }
 });
 
-// Get a single user
+
+// delete a single user
 
 const deleteaUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -305,6 +332,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
       htm: resetURL,
     };
     sendEmail(data);
+    console.log('sent')
     res.json(token);
   } catch (error) {
     throw new Error(error);
