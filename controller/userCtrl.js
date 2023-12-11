@@ -336,7 +336,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
     const resetURL = `Hi, Please follow this link to reset Your Password. This link is valid till 10 minutes from now. <a href='http://localhost:5000/api/user/reset-password/${token}'>Click Here</>`;
     const data = {
       to: email,
-      text: "Hey User",
+      text: "Hey guy",
       subject: "Forgot Password Link",
       htm: resetURL,
     };
