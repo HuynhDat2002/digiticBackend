@@ -40,7 +40,9 @@ const createUser = asyncHandler(async (req, res) => {
     throw new Error("User Already Exists");
   }
 });
-
+const logined=asyncHandler(async (req,res) => {
+  return res.json({Status:"Success"})
+});
 // Login a user
 const loginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -83,22 +85,21 @@ const loginAdmin = asyncHandler(async (req, res) => {
   if (findAdmin && (await findAdmin.isPasswordMatched(password))) {
     const refreshToken = await generateRefreshToken(findAdmin?._id);
     const updateuser = await User.findByIdAndUpdate(
-      findAdmin.id,
+      findAdmin._id,
       {
         refreshToken: refreshToken,
       },
       { new: true }
     );
+    
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000,
+      secure:true,
+      sameSite:'None'
     });
- 
-    const token = generateToken(findAdmin?._id);
-    if(localStorage.getItem("token")){
-      localStorage.removeItem("token")
-    }
-    await localStorage.setItem("token",JSON.stringify(token))
+    if(req.cookies) console.log(req.cookies.refreshToken)
+   
     res.json({
       _id: findAdmin?._id,
       firstname: findAdmin?.firstname,
@@ -107,7 +108,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
       mobile: findAdmin?.mobile,
       address:findAdmin?.address,
       image:findAdmin?.image,
-      token: JSON.parse(localStorage.getItem("token")).toString(),
+      token:generateToken(findAdmin?._id),
     });
   } else {
     throw new Error("Invalid Credentials");
@@ -135,13 +136,18 @@ const handleRefreshToken = asyncHandler(async (req, res) => {
 
 const logout = asyncHandler(async (req, res) => {
   const cookie = req.cookies;
+  console.log(cookie)
   if (!cookie?.refreshToken) throw new Error("No Refresh Token in Cookies");
+  console.log('has cookie')
+
   const refreshToken = cookie.refreshToken;
   const user = await User.findOne({ refreshToken });
+  console.log(user)
   if (!user) {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
+      sameSite:'None'
     });
     return res.sendStatus(204); // forbidden
   }
@@ -151,7 +157,9 @@ const logout = asyncHandler(async (req, res) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: true,
+    sameSite:'None'
   });
+  
   res.sendStatus(204); // forbidden
 });
 
@@ -169,7 +177,8 @@ const updatedUser = asyncHandler(async (req, res) => {
         lastname: req?.body?.lastname,
         email: req?.body?.email,
         mobile: req?.body?.mobile,
-        address:req?.body?.address
+        address:req?.body?.address,
+        image:req?.body?.image
       },
       {
         new: true,
@@ -578,4 +587,5 @@ module.exports = {
   updateOrderStatus,
   getAllOrders,
   getOrderByUserId,
+  logined
 };

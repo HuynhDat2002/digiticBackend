@@ -21,10 +21,17 @@ const cors = require("cors");
 
 dbConnect();
 app.use(morgan("dev"));
-app.use(cors());
+app.use(cors({
+  origin:["http://localhost:3000"],
+  methods: ["GET,HEAD,PUT,PATCH,POST,DELETE"],
+  credentials:true,
+}));
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
