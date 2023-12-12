@@ -332,8 +332,9 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
   if (!user) throw new Error("User not found with this email");
   try {
     const token = await user.createPasswordResetToken();
+    console.log(token);
     await user.save();
-    const resetURL = `Hi, Please follow this link to reset Your Password. This link is valid till 10 minutes from now. <a href='http://localhost:5000/api/user/reset-password/${token}'>Click Here</>`;
+    const resetURL = `Hi, Please follow this link to reset Your Password. This link is valid till 10 minutes from now. <a href='http://localhost:3000/reset-password/${token}'>Click Here</>`;
     const data = {
       to: email,
       text: "Hey guy",
@@ -343,7 +344,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
     sendEmail(data);
     console.log('sent')
     res.json(token);
-  } catch (error) {
+  } catch (error){
     throw new Error(error);
   }
 });
