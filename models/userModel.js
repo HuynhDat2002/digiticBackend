@@ -43,10 +43,10 @@ var userSchema = new mongoose.Schema(
       default: ""
     },
     image:{
-      public_id: String,
-      url: String,
+      type: String,
+      default:"https://cdn-icons-png.flaticon.com/128/1077/1077063.png"
     },
-
+    address:[{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     refreshToken: {
       type: String,
