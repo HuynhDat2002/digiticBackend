@@ -17,15 +17,17 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
-  const id = req.params;
+  const id = req.params.id;
+  console.log("id: ",id);
   validateMongoDbId(id);
   try {
     if (req.body.title) {
       req.body.slug = slugify(req.body.title);
     }
-    const updateProduct = await Product.findOneAndUpdate({ id }, req.body, {
+    const updateProduct = await Product.findOneAndUpdate({ _id:id }, req.body, {
       new: true,
     });
+    console.log(updateProduct)
     res.json(updateProduct);
   } catch (error) {
     throw new Error(error);
@@ -62,22 +64,28 @@ const getAllProduct = asyncHandler(async (req, res) => {
     excludeFields.forEach((el) => delete queryObj[el]);
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
+    console.log(JSON.parse(queryStr))
     let query = Product.find(JSON.parse(queryStr));
-
     // Sorting
-
+    console.log(query)
     if (req.query.sort) {
       const sortBy = req.query.sort.split(",").join(" ");
       query = query.sort(sortBy);
     } else {
       query = query.sort("-createdAt");
     }
+    if(req.query.maxprice){
+      query = query.where('price').lte(req.query.maxprice);
+    }
+    if(req.query.minprice){
+      query = query.where('price').gte(req.query.maxprice);
 
+    }
     // limiting the fields
 
     if (req.query.fields) {
       const fields = req.query.fields.split(",").join(" ");
+      console.log(fields)
       query = query.select(fields);
     } else {
       query = query.select("-__v");

@@ -185,7 +185,7 @@ const updatedUser = asyncHandler(async (req, res) => {
       }
     );
     const findAdmin = await User.findById(_id);
-    const token=generateToken(_id);
+
     
     res.json({
       _id: updatedUser._id,
@@ -195,7 +195,7 @@ const updatedUser = asyncHandler(async (req, res) => {
       mobile: updatedUser.mobile,
       address:updatedUser.address,
       image:updatedUser.image,
-      token: JSON.parse(localStorage.getItem("token")).toString(),
+      token:generateToken(_id),
     });
   } catch (error) {
     console.log(error);
@@ -350,6 +350,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
+  console.log("password")
   const { password } = req.body;
   const { token } = req.params;
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
