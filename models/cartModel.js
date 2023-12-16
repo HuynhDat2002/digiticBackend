@@ -15,6 +15,19 @@ var cartSchema = new mongoose.Schema(
       },
     ],
     cartTotal: Number,
+
+    coupon: {
+      couponId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Coupon",
+      },
+      name: String,
+      discount: Number,
+      default:{}
+    },
+
+
+
     totalAfterDiscount: Number,
     orderby: {
       type: mongoose.Schema.Types.ObjectId,

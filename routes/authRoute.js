@@ -20,6 +20,7 @@ const {
   getUserCart,
   emptyCart,
   applyCoupon,
+  removeCoupon,
   createOrder,
   getOrders,
   updateOrderStatus,
@@ -39,6 +40,8 @@ router.post("/login", loginUserCtrl);
 router.post("/admin-login", loginAdmin);
 router.post("/cart", authMiddleware, userCart);
 router.post("/cart/applycoupon", authMiddleware, applyCoupon);
+router.delete("/cart/remove-coupon", authMiddleware, removeCoupon);
+
 router.post("/cart/cash-order", authMiddleware, createOrder);
 router.get("/all-users",authMiddleware,isAdmin, getallUser);
 router.get("/get-orders", authMiddleware, getOrders);

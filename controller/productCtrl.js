@@ -2,7 +2,9 @@ const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
+const { clouldinaryUploadImg, cloudinary } = require("../utils/cloudinary")
 const validateMongoDbId = require("../utils/validateMongodbId");
+const fs = require('fs')
 
 const createProduct = asyncHandler(async (req, res) => {
   try {
@@ -18,13 +20,13 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const updateProduct = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  console.log("id: ",id);
+  console.log("id: ", id);
   validateMongoDbId(id);
   try {
     if (req.body.title) {
       req.body.slug = slugify(req.body.title);
     }
-    const updateProduct = await Product.findOneAndUpdate({ _id:id }, req.body, {
+    const updateProduct = await Product.findOneAndUpdate({ _id: id }, req.body, {
       new: true,
     });
     console.log(updateProduct)
@@ -74,10 +76,10 @@ const getAllProduct = asyncHandler(async (req, res) => {
     } else {
       query = query.sort("-createdAt");
     }
-    if(req.query.maxprice){
+    if (req.query.maxprice) {
       query = query.where('price').lte(req.query.maxprice);
     }
-    if(req.query.minprice){
+    if (req.query.minprice) {
       query = query.where('price').gte(req.query.maxprice);
 
     }
@@ -141,6 +143,8 @@ const addToWishlist = asyncHandler(async (req, res) => {
   }
 });
 
+
+
 const rating = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { star, prodId, comment } = req.body;
@@ -197,6 +201,36 @@ const rating = asyncHandler(async (req, res) => {
   }
 });
 
+const uploadImages = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  console.log(req.files)
+  validateMongoDbId(id);
+  try {
+    const urls = [];
+    const files = req.files;
+    for (const file of files) {
+      const { path } = file;
+      console.log(path)
+      const newpath = await cloudinary.uploader.upload(path, { folder: "digiticShop/images/products" })
+     
+    console.log(newpath);
+    urls.push(newpath);
+    // fs.unlinkSync(path);
+  }
+    const findProduct = await Product.findByIdAndUpdate(id, {
+    images: urls.map((file) => {
+      return file;
+    }),
+  }, {
+    new: true,
+  })
+  res.json(findProduct)
+}
+  catch (error) {
+  throw new Error(error)
+}
+});
+
 module.exports = {
   createProduct,
   getaProduct,
@@ -205,4 +239,5 @@ module.exports = {
   deleteProduct,
   addToWishlist,
   rating,
+  uploadImages
 };

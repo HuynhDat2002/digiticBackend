@@ -35,18 +35,20 @@ var userSchema = new mongoose.Schema(
       default: false,
     },
     cart: {
-      type: Array,
-      default: [],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Cart",
+      default:[]
     },
+    
     address: {
       type: String,
-      default: ""
+      required: false,
     },
     image:{
       type: String,
       default:"https://cdn-icons-png.flaticon.com/128/1077/1077063.png"
     },
-    address:[{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
+    // address:[{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     refreshToken: {
       type: String,
