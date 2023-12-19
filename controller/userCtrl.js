@@ -20,25 +20,14 @@ const localStorage = new LocalStorage('./scratch')
 // Create a User ----------------------------------------------
 
 const createUser = asyncHandler(async (req, res) => {
-  /**
-   * TODO:Get the email from req.body
-   */
+
   const email = req.body.email;
-  /**
-   * TODO:With the help of email find the user exists or not
-   */
   const findUser = await User.findOne({ email: email });
 
   if (!findUser) {
-    /**
-     * TODO:if user not found user create a new user
-     */
     const newUser = await User.create(req.body);
     res.json(newUser);
   } else {
-    /**
-     * TODO:if user found then thow an error: User already exists
-     */
     throw new Error("User Already Exists");
   }
 });
@@ -62,6 +51,8 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000,
+      sameSite: 'None',
+      secure:true
     });
     res.json({
       _id: findUser?._id,
@@ -138,6 +129,7 @@ const handleRefreshToken = asyncHandler(async (req, res) => {
 
 const logout = asyncHandler(async (req, res) => {
   const cookie = req.cookies;
+
   console.log(cookie)
   if (!cookie?.refreshToken) throw new Error("No Refresh Token in Cookies");
   console.log('has cookie')
@@ -330,8 +322,12 @@ const updatePassword = asyncHandler(async (req, res) => {
 
 const forgotPasswordToken = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email:email });
   if (!user) throw new Error("User not found with this email");
+  if (!user.cart) {
+    user.cart = null ; // Đảm bảo rằng cart không phải là mảng trống
+  }
+
   try {
     const token = await user.createPasswordResetToken();
     console.log(token);
@@ -360,6 +356,9 @@ const resetPassword = asyncHandler(async (req, res) => {
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
+  if (!user.cart) {
+    user.cart = null ; // Đảm bảo rằng cart không phải là mảng trống
+  }
 
   if (!user) throw new Error(" Token Expired, Please try again later");
   console.log("user reset password: ", user);
