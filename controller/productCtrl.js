@@ -37,10 +37,10 @@ const updateProduct = asyncHandler(async (req, res) => {
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
-  const id = req.params;
+  const {id} = req.params;
   validateMongoDbId(id);
   try {
-    const deleteProduct = await Product.findOneAndDelete(id);
+    const deleteProduct = await Product.findByIdAndDelete(id);
     res.json(deleteProduct);
   } catch (error) {
     throw new Error(error);
@@ -67,7 +67,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     console.log(JSON.parse(queryStr))
-    let query = Product.find(JSON.parse(queryStr));
+    let query = Product.find(JSON.parse(queryStr)).populate("color");
     // Sorting
     console.log(query)
     if (req.query.sort) {
@@ -76,13 +76,13 @@ const getAllProduct = asyncHandler(async (req, res) => {
     } else {
       query = query.sort("-createdAt");
     }
-    if (req.query.maxprice) {
-      query = query.where('price').lte(req.query.maxprice);
-    }
-    if (req.query.minprice) {
-      query = query.where('price').gte(req.query.maxprice);
+    // if (req.query.maxprice) {
+    //   query = query.where('price').lte(req.query.maxprice);
+    // }
+    // if (req.query.minprice) {
+    //   query = query.where('price').gte(req.query.maxprice);
 
-    }
+    // }
     // limiting the fields
 
     if (req.query.fields) {
@@ -212,23 +212,26 @@ const uploadImages = asyncHandler(async (req, res) => {
       const { path } = file;
       console.log(path)
       const newpath = await cloudinary.uploader.upload(path, { folder: "digiticShop/images/products" })
-     
-    console.log(newpath);
-    urls.push(newpath);
-    // fs.unlinkSync(path);
-  }
+
+      console.log(newpath);
+      urls.push(newpath);
+      // fs.unlinkSync(path);
+    }
     const findProduct = await Product.findByIdAndUpdate(id, {
-    images: urls.map((file) => {
-      return file;
-    }),
-  }, {
-    new: true,
-  })
-  res.json(findProduct)
-}
+      $push: {
+        images: urls.map((file) => ({
+          public_id: file.public_id,
+          url: file.url,
+        })),
+      },
+    }, {
+      new: true,
+    })
+    res.json(findProduct)
+  }
   catch (error) {
-  throw new Error(error)
-}
+    throw new Error(error)
+  }
 });
 
 module.exports = {
