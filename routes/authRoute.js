@@ -18,7 +18,7 @@ const {
   saveAddress,
   userCart,
   getUserCart,
-  
+  getMyOrders,
   createOrder,
   
   getMonthWiseOrderIncome ,
@@ -39,7 +39,7 @@ router.post("/cart", authMiddleware, userCart);
 router.get('/getMonthWiseOrderIncome',authMiddleware,getMonthWiseOrderIncome)
 router.post("/cart/create-order", authMiddleware, createOrder);
 router.get("/all-users",authMiddleware,isAdmin, getallUser);
-//router.get("/get-orders", authMiddleware, getOrders);
+router.get("/getmyorders", authMiddleware, getMyOrders);
 //router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
 //router.get("/getorderbyuser/:id", authMiddleware, getOrderByUserId );
 router.get("/refresh", handleRefreshToken);

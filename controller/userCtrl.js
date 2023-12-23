@@ -669,6 +669,19 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 });
 
+const getMyOrders = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  try {
+    const orders = await Order.find({userId:_id}).populate("user").populate("orderItems.product").populate("orderItems.color")
+    res.json({
+      orders
+    })
+  }
+  catch (error) {
+    throw new Error(error);
+  }
+});
+
 const getMonthWiseOrderIncome = asyncHandler(async (req, res) => {
   var month = ["January", "February", "March", "April", "May", "June", "July",
     "August", "September", "October", "November", "December"];
@@ -718,7 +731,7 @@ module.exports = {
   saveAddress,
   userCart,
   getUserCart,
-  
+  getMyOrders,
   createOrder,
  
   getMonthWiseOrderIncome
