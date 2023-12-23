@@ -26,6 +26,22 @@ var orderSchema = new mongoose.Schema(
         "Delivered",
       ],
     },
+    paidAt:{
+      type:Date,
+      default:Date.now()
+    },
+    totalPrice:{
+      type:Number,
+      require:true,
+    },
+    totalPriceAfterDiscount:{
+      type:Number,
+      require:true
+    },
+    month:{
+      type:String,
+      default:new Date().getMonth()
+    },
     orderby: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
