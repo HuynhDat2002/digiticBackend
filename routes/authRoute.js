@@ -20,10 +20,12 @@ const {
   getUserCart,
   getMyOrders,
   createOrder,
-  
+  removeProductFromCart,
   getMonthWiseOrderIncome ,
+  updateProductQuantityFromCart,
 } = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
+const { checkout, paymentVertification } = require("../controller/paymentCtrl");
 const router = express.Router();
 router.post("/register", createUser);
 router.post("/forgot-password-token", forgotPasswordToken);
@@ -34,6 +36,8 @@ router.put("/password", authMiddleware, updatePassword);
 router.post("/login", loginUserCtrl);
 router.post("/admin-login", loginAdmin);
 router.post("/cart", authMiddleware, userCart);
+router.delete('/cart/delete-product-cart/:cartItemId',authMiddleware,removeProductFromCart);
+router.delete("/update-product-cart/:cartItemId/:newQuantity",authMiddleware,updateProductQuantityFromCart);
 //router.post("/cart/applycoupon", authMiddleware, applyCoupon);
 //router.delete("/cart/remove-coupon", authMiddleware, removeCoupon);
 router.get('/getMonthWiseOrderIncome',authMiddleware,getMonthWiseOrderIncome)
@@ -46,7 +50,8 @@ router.get("/refresh", handleRefreshToken);
 router.get("/logout", logout);  
 router.get("/wishlist", authMiddleware, getWishlist);
 router.get("/cart", authMiddleware, getUserCart);
-
+router.post("/order/checkout",authMiddleware,checkout)
+router.post('/order/paymentVertification',authMiddleware,paymentVertification)
 router.get("/:id", authMiddleware, isAdmin, getaUser);
 //router.delete("/empty-cart", authMiddleware, emptyCart);
 router.delete("/:id", deleteaUser);

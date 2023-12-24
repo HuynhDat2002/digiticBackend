@@ -712,6 +712,36 @@ const getMonthWiseOrderIncome = asyncHandler(async (req, res) => {
   res.json(data);
 })
 
+const removeProductFromCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const {cartItemId} = req.params;
+  validateMongoDbId(_id);
+  try {
+    const deleteProductFromCart = await Cart.deleteOne({userId:_id,_id:cartItemId})
+    res.json(deleteProductFromCart);
+   
+  }
+  catch (error) {
+    throw new Error(error);
+  }
+});
+
+const updateProductQuantityFromCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const {cartItemId,newQuantity} = req.params;
+  console.log(typeof newQuantity)
+  validateMongoDbId(_id);
+  try {
+    const cartItem = await Cart.findOne({userId:_id,_id:cartItemId})
+    cartItem.quantity =  newQuantity;
+    await cartItem.save();
+    res.json(cartItem);
+   
+  }
+  catch (error) {
+    throw new Error(error);
+  }
+});
 module.exports = {
   createUser,
   loginUserCtrl,
@@ -733,6 +763,7 @@ module.exports = {
   getUserCart,
   getMyOrders,
   createOrder,
- 
-  getMonthWiseOrderIncome
+ removeProductFromCart,
+  getMonthWiseOrderIncome,
+  updateProductQuantityFromCart,
 };
