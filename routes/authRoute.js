@@ -18,17 +18,14 @@ const {
   saveAddress,
   userCart,
   getUserCart,
-  emptyCart,
-  applyCoupon,
-  removeCoupon,
+  getMyOrders,
   createOrder,
-  getOrders,
-  updateOrderStatus,
-  getAllOrders,
-  getOrderByUserId,
+  removeProductFromCart,
   getMonthWiseOrderIncome ,
+  updateProductQuantityFromCart,
 } = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
+const { checkout, paymentVertification } = require("../controller/paymentCtrl");
 const router = express.Router();
 router.post("/register", createUser);
 router.post("/forgot-password-token", forgotPasswordToken);
@@ -39,28 +36,31 @@ router.put("/password", authMiddleware, updatePassword);
 router.post("/login", loginUserCtrl);
 router.post("/admin-login", loginAdmin);
 router.post("/cart", authMiddleware, userCart);
-router.post("/cart/applycoupon", authMiddleware, applyCoupon);
-router.delete("/cart/remove-coupon", authMiddleware, removeCoupon);
-router.get('/getMonthWiseOrderIncome',authMiddleware,isAdmin,getMonthWiseOrderIncome)
-router.post("/cart/cash-order", authMiddleware, createOrder);
+router.delete('/cart/delete-product-cart/:cartItemId',authMiddleware,removeProductFromCart);
+router.delete("/update-product-cart/:cartItemId/:newQuantity",authMiddleware,updateProductQuantityFromCart);
+//router.post("/cart/applycoupon", authMiddleware, applyCoupon);
+//router.delete("/cart/remove-coupon", authMiddleware, removeCoupon);
+router.get('/getMonthWiseOrderIncome',authMiddleware,getMonthWiseOrderIncome)
+router.post("/cart/create-order", authMiddleware, createOrder);
 router.get("/all-users",authMiddleware,isAdmin, getallUser);
-router.get("/get-orders", authMiddleware, getOrders);
-router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
-router.get("/getorderbyuser/:id", authMiddleware, getOrderByUserId );
+router.get("/getmyorders", authMiddleware, getMyOrders);
+//router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
+//router.get("/getorderbyuser/:id", authMiddleware, getOrderByUserId );
 router.get("/refresh", handleRefreshToken);
 router.get("/logout", logout);  
 router.get("/wishlist", authMiddleware, getWishlist);
 router.get("/cart", authMiddleware, getUserCart);
-
+router.post("/order/checkout",authMiddleware,checkout)
+router.post('/order/paymentVertification',authMiddleware,paymentVertification)
 router.get("/:id", authMiddleware, isAdmin, getaUser);
-router.delete("/empty-cart", authMiddleware, emptyCart);
+//router.delete("/empty-cart", authMiddleware, emptyCart);
 router.delete("/:id", deleteaUser);
-router.put(
-  "/order/update-order/:id",
-  authMiddleware,
-  isAdmin,
-  updateOrderStatus
-);
+// router.put(
+//   "/order/update-order/:id",
+//   authMiddleware,
+//   isAdmin,
+//   updateOrderStatus
+// );
 router.put("/edit-user", authMiddleware, updatedUser);
 router.put("/save-address", authMiddleware, saveAddress);
 router.put("/block-user/:id", authMiddleware, isAdmin, blockUser);
