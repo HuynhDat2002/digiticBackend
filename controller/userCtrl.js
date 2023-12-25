@@ -379,6 +379,31 @@ const getWishlist = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+const removeProductFromWishlist = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const {prodId} = req.body;
+  validateMongoDbId(_id);
+  try {
+    const user = await User.findById(_id);
+    const alreadyadded = user.wishlist.find((id) => id.toString() === prodId);
+    if (alreadyadded) {
+      let user = await User.findByIdAndUpdate(
+        _id,
+        {
+          $pull: { wishlist: prodId },
+        },
+        {
+          new: true,
+        }
+      );
+      res.json(user);
+    }
+  }
+  catch (error) {
+    throw new Error(error);
+  }
+});
+
 
 const userCart = asyncHandler(async (req, res) => {
   const { productId,color,quantity,price } = req.body;
@@ -399,7 +424,8 @@ const userCart = asyncHandler(async (req, res) => {
     // console.log('id',id);
     //   user.cart.push(id)
     //  await user.save();
-    res.json(newCart);
+    let cart = await Cart.findOne({_id:newCart._id}).populate("productId color userId")
+    res.json(cart);
     // let products = [];
     // // check if user already have product in cart
     // const user = await User.findById(_id);
@@ -659,6 +685,7 @@ const createOrder = asyncHandler(async (req, res) => {
     const order = await Order.create({
       shippingInfo, orderItems, totalPrice, totalPriceAfterDiscount, paymentInfo, user: _id
     })
+    const cart=await Cart.deleteMany({userId:_id})
     res.json({
       order,
       success: true
@@ -732,7 +759,7 @@ const updateProductQuantityFromCart = asyncHandler(async (req, res) => {
   console.log(typeof newQuantity)
   validateMongoDbId(_id);
   try {
-    const cartItem = await Cart.findOne({userId:_id,_id:cartItemId})
+    const cartItem = await Cart.findOne({userId:_id,_id:cartItemId}).populate("productId userId color")
     cartItem.quantity =  newQuantity;
     await cartItem.save();
     res.json(cartItem);
@@ -766,4 +793,5 @@ module.exports = {
  removeProductFromCart,
   getMonthWiseOrderIncome,
   updateProductQuantityFromCart,
+  removeProductFromWishlist,
 };
