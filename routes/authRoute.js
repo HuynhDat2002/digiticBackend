@@ -21,6 +21,7 @@ const {
   getMyOrders,
   createOrder,
   removeProductFromCart,
+  deleteCart,
   getMonthWiseOrderIncome ,
   updateProductQuantityFromCart,
   removeProductFromWishlist,
@@ -38,6 +39,8 @@ router.post("/login", loginUserCtrl);
 router.post("/admin-login", loginAdmin);
 router.post("/cart", authMiddleware, userCart);
 router.delete('/cart/delete-product-cart/:cartItemId',authMiddleware,removeProductFromCart);
+router.delete('/cart/delete-cart',authMiddleware,deleteCart);
+
 router.delete("/update-product-cart/:cartItemId/:newQuantity",authMiddleware,updateProductQuantityFromCart);
 //router.post("/cart/applycoupon", authMiddleware, applyCoupon);
 //router.delete("/cart/remove-coupon", authMiddleware, removeCoupon);
@@ -51,6 +54,7 @@ router.get("/refresh", handleRefreshToken);
 router.get("/logout", logout);  
 router.get("/wishlist", authMiddleware, getWishlist);
 router.delete("/wishlist",authMiddleware,removeProductFromWishlist)
+
 router.get("/cart", authMiddleware, getUserCart);
 // router.post("/order/checkout",authMiddleware,checkout)
 router.post('/create-payment-intent',authMiddleware,paymentIntent)

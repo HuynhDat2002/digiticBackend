@@ -752,6 +752,20 @@ const removeProductFromCart = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+const deleteCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+
+  validateMongoDbId(_id);
+  try {
+    const deleteProductFromCart = await Cart.deleteMany({userId:_id})
+    res.json(deleteProductFromCart);
+   
+  }
+  catch (error) {
+    throw new Error(error);
+  }
+});
+
 
 const updateProductQuantityFromCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
@@ -759,8 +773,8 @@ const updateProductQuantityFromCart = asyncHandler(async (req, res) => {
   console.log(typeof newQuantity)
   validateMongoDbId(_id);
   try {
-    const cartItem = await Cart.findOne({userId:_id,_id:cartItemId}).populate("productId userId color")
-    cartItem.quantity =  newQuantity;
+    const cartItem = await Cart.findOneAndUpdate({userId:_id,_id:cartItemId},{quantity:newQuantity},{new:true}).populate("productId userId color")
+
     await cartItem.save();
     res.json(cartItem);
    
@@ -791,6 +805,7 @@ module.exports = {
   getMyOrders,
   createOrder,
  removeProductFromCart,
+ deleteCart,
   getMonthWiseOrderIncome,
   updateProductQuantityFromCart,
   removeProductFromWishlist,

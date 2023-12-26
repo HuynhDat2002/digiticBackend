@@ -10,44 +10,40 @@ var orderSchema = new mongoose.Schema(
     
   },
   shippingInfo: {
-    firstName:{
+    name:{
       type:String,
       required:true,
     },
-    lastName:{
+    phone:{
       type:String,
       required:true,
     },
     address:{
-      type:String,
-      required:true,
+      city:{
+        type:String,
+      },
+      country:{
+        type:String,
+      },
+      line1:{
+        type:String,
+      },
+      line2:{
+        type:String,
+      }
     },
-    city:{
-      type:String,
-      required:true,
-    },
-    state:{
-      type:String,
-      required:true,
-    },
-    other:{
-      type:String,
-      required:true,
-    },
-    pincode:{
-      type:String,
-      required:true,
-    }
+   
+
+    
   },
   paymentInfo:{
-    razorpayOrderId: {
-      type:String,
-      required:true,
-    }, 
-    razorpayPaymentId: {
-      type:String,
-      required:true,
+    id:{
+      type:String
     },
+    currency:{
+      type:String
+    },
+    paymentTypes:[],
   },
   orderItems:[
     {
@@ -89,7 +85,7 @@ var orderSchema = new mongoose.Schema(
   },
   month:{
     type:String,
-    default:new Date().getMonth()
+    default:new Date().getMonth()+1
   },
   
  }, 
