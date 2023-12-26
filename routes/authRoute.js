@@ -26,6 +26,9 @@ const {
   getYearlyTotalOrders,
   getMonthWiseOrderCount,
   removeProductFromWishlist,
+  getAllOrders,
+  getSingleOrders,
+  updateOrder,
 } = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const { paymentIntent }  = require("../controller/paymentCtrl");
@@ -45,13 +48,15 @@ router.delete("/update-product-cart/:cartItemId/:newQuantity",authMiddleware,upd
 //router.delete("/cart/remove-coupon", authMiddleware, removeCoupon);
 
 router.get('/getMonthWiseOrderIncome',authMiddleware,getMonthWiseOrderIncome)
-router.get('/getMonthWiseOrderCount',authMiddleware,getMonthWiseOrderCount)
+
 router.get('/getyearlyorders',authMiddleware,getYearlyTotalOrders)
 
 router.post("/cart/create-order", authMiddleware, createOrder);
 router.get("/all-users",authMiddleware,isAdmin, getallUser);
 router.get("/getmyorders", authMiddleware, getMyOrders);
-//router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
+router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
+router.get("/getaOrder/:id", authMiddleware, isAdmin, getSingleOrders);
+router.put("/updateOrder/:id", authMiddleware, isAdmin, updateOrder);
 //router.get("/getorderbyuser/:id", authMiddleware, getOrderByUserId );
 router.get("/refresh", handleRefreshToken);
 router.get("/logout", logout);  
