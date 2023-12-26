@@ -25,9 +25,10 @@ const {
   updateProductQuantityFromCart,
   getYearlyTotalOrders,
   getMonthWiseOrderCount,
+  removeProductFromWishlist,
 } = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
-const { checkout, paymentVertification } = require("../controller/paymentCtrl");
+const { paymentIntent }  = require("../controller/paymentCtrl");
 const router = express.Router();
 router.post("/register", createUser);
 router.post("/forgot-password-token", forgotPasswordToken);
@@ -55,9 +56,10 @@ router.get("/getmyorders", authMiddleware, getMyOrders);
 router.get("/refresh", handleRefreshToken);
 router.get("/logout", logout);  
 router.get("/wishlist", authMiddleware, getWishlist);
+router.delete("/wishlist",authMiddleware,removeProductFromWishlist)
 router.get("/cart", authMiddleware, getUserCart);
-router.post("/order/checkout",authMiddleware,checkout)
-router.post('/order/paymentVertification',authMiddleware,paymentVertification)
+// router.post("/order/checkout",authMiddleware,checkout)
+router.post('/create-payment-intent',authMiddleware,paymentIntent)
 router.get("/:id", authMiddleware, isAdmin, getaUser);
 //router.delete("/empty-cart", authMiddleware, emptyCart);
 router.delete("/:id", deleteaUser);
