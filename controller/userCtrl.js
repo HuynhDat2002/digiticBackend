@@ -819,7 +819,7 @@ const getYearlyTotalOrders = asyncHandler(async (req, res) => {
   let d = new Date();
   let endDate = "";
   d.setDate(1)
-  I
+  
   for (let index = 0; index < 11; index++) {
     d.setMonth(d.getMonth() - 1)
     endDate = monthNames[d.getMonth()] + " " + d.getFullYear()

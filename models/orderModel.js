@@ -47,24 +47,21 @@ var orderSchema = new mongoose.Schema(
   },
   orderItems:[
     {
-      product:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Product",
-        required:true
-      },
-      color:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Color",
-        required:true
-      },
-      quantity:{
-        type:Number,
-        required:true
-      },
-      price:{
-        type:Number,
-        required:true
-      },
+        productId:{
+          type:mongoose.Schema.Types.ObjectId,
+          ref:"Product",
+          required:true
+        },
+        color:{
+          type:mongoose.Schema.Types.ObjectId,
+          ref:"Color",
+          
+        },
+        quantity:{
+          type:Number,
+          
+        }
+     
     }
   ],
   paidAt:{

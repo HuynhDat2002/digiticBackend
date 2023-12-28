@@ -40,12 +40,20 @@ const asyncHandler = require("express-async-handler");
 // }
 const dotenv = require("dotenv").config();
 
-const stripe = require('stripe')("sk_test_51OGEGLKScb87tq5mbDkwZcziQDqn3wNGIroN5GWitltbXeuiM9mOSeyH8JutA602fFgmE4Z7zjP9kuTJJDqw0x6U00i9rH9oED");
+const stripe = require('stripe')(process.env.SCRIPT_PRIVATE_KEY);
 
 const paymentIntent = asyncHandler(async (req, res) => {
     const {amountTotal,shipInfo} = req.body;
-
+//const carrierMeta = carrier.map(item=>({
+  //  id:item.id,
+   //title:item.title,
+  //brand:item.brand,
+    //price:item.price,
+ //  quatity:item.quantity,
+   //color:item.color
+//}))
     try {
+
         const stp = await stripe.paymentIntents.create({
             amount:amountTotal ,
             shipping:{
@@ -55,10 +63,11 @@ const paymentIntent = asyncHandler(async (req, res) => {
                 address:{
                     city:shipInfo.city,
                     country:shipInfo.country,
-                    line1:shipInfo.address,
-                }
+                    line1:shipInfo.line1,
+                },
             },
-    
+          
+            
             currency: 'vnd',
             automatic_payment_methods: {
                 enabled: true,
