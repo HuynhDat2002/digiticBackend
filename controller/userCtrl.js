@@ -687,6 +687,24 @@ const createOrder = asyncHandler(async (req, res) => {
       shippingInfo, orderItems, totalPrice, totalPriceAfterDiscount, paymentInfo, user: _id
     })
     const cart=await Cart.deleteMany({userId:_id})
+    // orderItems.forEach(item=>{
+    // Product.findOneAndUpdate(
+    //     {_id:item.productId},
+    //     { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+    //     {new:true}
+    //     ).save()
+
+    // })
+        let update =orderItems.map((item) => {
+      return {
+        updateOne: {
+          filter: { _id: item.productId },
+          update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+        },
+      };
+    });
+        const updated = await Product.bulkWrite(update, {});
+
     res.json({
       order,
       success: true
