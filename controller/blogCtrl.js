@@ -5,8 +5,9 @@ const validateMongoDbId = require("../utils/validateMongodbId");
 const { cloudinary } = require("../utils/cloudinary");
 const fs = require("fs");
 const createBlog = asyncHandler(async (req, res) => {
+  const {blog} = req.body;
   try {
-    const newBlog = await Blog.create(req.body);
+    const newBlog = await Blog.create(blog);
     res.json(newBlog);
   } catch (error) {
     throw new Error(error);

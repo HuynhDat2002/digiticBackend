@@ -495,12 +495,13 @@ const userCart = asyncHandler(async (req, res) => {
 
 const getUserCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
+  console.log(_id);
   validateMongoDbId(_id);
   try {
     const user = await User.findOne({ _id });
 
     console.log('cart: ', userCart)
-    const cart = await Cart.find({ userId: user._id }).populate(
+    const cart = await Cart.find({ userId: _id }).populate(
       "productId userId color",
 
     );
@@ -798,6 +799,20 @@ const removeProductFromCart = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+const deleteCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+
+  validateMongoDbId(_id);
+  try {
+    const deleteProductFromCart = await Cart.deleteMany({userId:_id})
+    res.json(deleteProductFromCart);
+   
+  }
+  catch (error) {
+    throw new Error(error);
+  }
+});
+
 
 const getYearlyTotalOrders = asyncHandler(async (req, res) => {
   let monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -836,9 +851,11 @@ const updateProductQuantityFromCart = asyncHandler(async (req, res) => {
   console.log(typeof newQuantity)
   validateMongoDbId(_id);
   try {
-    
-    const cartItem = await Cart.findOne({userId:_id,_id:cartItemId}).populate("productId userId color")
-    cartItem.quantity =  newQuantity;
+
+
+    const cartItem = await Cart.findOneAndUpdate({userId:_id,_id:cartItemId},{quantity:newQuantity},{new:true}).populate("productId userId color")
+
+
     await cartItem.save();
     res.json(cartItem);
 
@@ -868,7 +885,12 @@ module.exports = {
   getUserCart,
   getMyOrders,
   createOrder,
+
   removeProductFromCart,
+
+ removeProductFromCart,
+ deleteCart,
+
   getMonthWiseOrderIncome,
   updateProductQuantityFromCart,
   

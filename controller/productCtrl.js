@@ -62,14 +62,13 @@ const getAllProduct = asyncHandler(async (req, res) => {
   try {
     // Filtering
     const queryObj = { ...req.query };
-    const excludeFields = ["page", "sort", "limit", "fields"];
+    const excludeFields = ["page", "sort", "limit","search", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    console.log(JSON.parse(queryStr))
+    console.log('querystr',JSON.parse(queryStr))
     let query = Product.find(JSON.parse(queryStr)).populate("color");
     // Sorting
-    console.log(query)
     if (req.query.sort) {
       const sortBy = req.query.sort.split(",").join(" ");
       query = query.sort(sortBy);
@@ -87,11 +86,62 @@ const getAllProduct = asyncHandler(async (req, res) => {
 
     if (req.query.fields) {
       const fields = req.query.fields.split(",").join(" ");
-      console.log(fields)
+      console.log('fields',fields)
       query = query.select(fields);
     } else {
       query = query.select("-__v");
     }
+
+    
+    // if (req.query.fields) {
+    //   const fields = req.query.fields.split(",").join(" "); 
+    //   const requestedFields = req.query.fields.split(",");
+
+    //   console.log('fields',fields)
+    //   const regexPatterns = {
+    //     fields: { $regex: new RegExp(req.query.search, 'i') }
+    //   }
+    
+    //   // Combine regex patterns with $or for multiple fields
+    //   const searchCondition = { $or: regexPatterns };
+    
+    //   // Apply the search condition to the query
+    //   query = query.find(searchCondition);
+    // }
+    
+    //search
+    if (req.query.search) {
+      Product.createIndexes({ description: 'text' ,title:"text",category:"text",brand:"text",tags:"text"});
+      const searchRegex = new RegExp(req.query.search, 'i');
+      const searchQuery = { $text: { $search: searchRegex } };
+      query = query.find(searchQuery);
+      // query = query.or([
+      //   { category: { $regex: searchRegex } },
+      //   {brand: { $regex: searchRegex } },
+      //   { title: { $regex: searchRegex } },
+      //   { description: { $regex: searchRegex } },
+        // Thêm các trường khác mà bạn muốn tìm kiếm ở đây
+      //]);
+    }
+
+    // if(req.query.search){
+    //   const q = {}
+    //   q.$or=[
+    //     {
+    //       category:{$regex: new RegExp(req.query.search, 'i')}
+    //     },
+    //     {
+    //       brand:{$regex: new RegExp(req.query.search, 'i')}
+    //     },
+    //     {
+    //       title:{$regex: new RegExp(req.query.search, 'i')}
+    //     },
+    //     {
+    //       description:{$regex: new RegExp(req.query.search, 'i')}
+    //     },
+    //   ]
+    //   query=query.find(q)
+    // }
 
     // pagination
 
@@ -100,6 +150,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     const skip = (page - 1) * limit;
     query = query.skip(skip).limit(limit);
     if (req.query.page) {
+      console.log('page',typeof req.query.page);
       const productCount = await Product.countDocuments();
       if (skip >= productCount) throw new Error("This Page does not exists");
     }
