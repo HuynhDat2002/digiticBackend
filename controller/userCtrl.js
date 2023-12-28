@@ -495,12 +495,13 @@ const userCart = asyncHandler(async (req, res) => {
 
 const getUserCart = asyncHandler(async (req, res) => {
   const { _id } = req.user;
+  console.log(_id);
   validateMongoDbId(_id);
   try {
     const user = await User.findOne({ _id });
 
     console.log('cart: ', userCart)
-    const cart = await Cart.find({ userId: user._id }).populate(
+    const cart = await Cart.find({ userId: _id }).populate(
       "productId userId color",
    
     );
