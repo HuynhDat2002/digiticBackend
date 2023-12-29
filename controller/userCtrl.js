@@ -718,7 +718,7 @@ const createOrder = asyncHandler(async (req, res) => {
 const getMyOrders = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   try {
-    const orders = await Order.find({ userId: _id }).populate("user").populate("orderItems.product").populate("orderItems.color")
+    const orders = await Order.find({ userId: _id }).populate("user").populate("orderItems.productId").populate("orderItems.color")
     res.json({
       orders
     })
@@ -745,7 +745,7 @@ const getSingleOrders = asyncHandler(async (req, res) => {
 const {id}=req.params
   
   try {
-    const orders = await Order.findOne({_id:id}).populate("products.product").populate("products.color")
+    const orders = await Order.findOne({_id:id}).populate("user").populate("orderItems.productId").populate("orderItems.color")
     res.json({
       orders
     })
