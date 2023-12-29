@@ -58,7 +58,7 @@ router.post("/cart/create-order", authMiddleware, createOrder);
 router.get("/all-users",authMiddleware,isAdmin, getallUser);
 router.get("/getmyorders", authMiddleware, getMyOrders);
 router.get("/getallorders", authMiddleware, isAdmin, getAllOrders);
-router.get("/getaOrder/:id", authMiddleware, isAdmin, getSingleOrders);
+router.get("/getaOrder/:id", authMiddleware, getSingleOrders);
 router.put("/updateOrder/:id", authMiddleware, isAdmin, updateOrder);
 //router.get("/getorderbyuser/:id", authMiddleware, getOrderByUserId );
 router.get("/refresh", handleRefreshToken);
