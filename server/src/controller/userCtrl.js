@@ -26,7 +26,7 @@ const createUser = asyncHandler(async (req, res) => {
 
   if (!findUser) {
     const newUser = await User.create(req.body);
-    res.json(newUser);
+    res.status(201).json(newUser);
   } else {
     throw new Error("User Already Exists");
   }
