@@ -9,7 +9,6 @@ services:
     volumes:
       - ./db/:/data/db
 
-
   server:
     image: server
     build:
@@ -64,6 +63,7 @@ services:
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
       - /var/log/nginx:/var/log/nginx
+      - ./logstash/csv:/usr/share/logstash/csv
     depends_on:
       - elasticsearch
     ports:
